@@ -1,4 +1,4 @@
-import { createTeamArgTyp } from "@/types";
+import { createTeamArgTyp, inviteMembersArgTyp, updateMembershipTyp } from "@/types";
 import { teams } from "./config";
 import {
     ID
@@ -20,7 +20,19 @@ export async function CreateTeam(args: createTeamArgTyp) {
 }
 
 export async function InviteMembers(args: inviteMembersArgTyp) {
-
-    
+    try {
+        const res = await teams.createMembership(args.teamId, args.roles, args.email)
+        return res
+    } catch (error) {
+        console.error(error)
+    }
 }
 
+export async function UpdateMembershipStatus(args: updateMembershipTyp) {
+    try {
+        const res = await teams.updateMembershipStatus(args.teamId, args.membershipId, args.userId, args.secret)
+        return res
+    } catch (error) {
+        console.error(error)
+    }
+}
