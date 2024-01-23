@@ -1,4 +1,7 @@
 import { CrossCircledIcon } from "@radix-ui/react-icons";
+import { PlusCircledIcon } from "@radix-ui/react-icons"
+import { PlayIcon } from "@radix-ui/react-icons"
+
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -8,16 +11,22 @@ import * as zod from "zod"
 import { useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { DevTool } from "@hookform/devtools";
-
+import { createTeamMutation } from "@/lib/queries/queries";
+import { useToast } from "@/components/ui/use-toast"
+import { ToastAction } from "@radix-ui/react-toast";
+import { useNavigate } from "react-router-dom";
 
 const CreateTeamSchema = zod.object({
-    teamname: zod.string().max(100, { message: "teamName characters limit exceeds." }),
-    roles: zod.string(),
+    teamname: zod.string().max(100, { message: "teamName characters limit exceeds." }).min(1, { message: "team name couldn't be empty." }),
+    roles: zod.string()
 })
 
 type CreateTeamType = zod.infer<typeof CreateTeamSchema>
 
 export default function CreateTeam() {
+
+    const navigate = useNavigate()
+    const { toast } = useToast()
 
     const roles = useRef<string[]>([])
 
@@ -29,12 +38,24 @@ export default function CreateTeam() {
         }
     })
 
-    function ivkOnSubmit(formData: CreateTeamType | { teamname: string, roles: string[] }) {
+    const { mutateAsync: createTeam, isPending: creatingTeam } = createTeamMutation()
+
+    async function ivkOnSubmit(formData: CreateTeamType | { teamname: string, roles: string[] }) {
+
         formData = {
             ...formData,
             roles: roles.current
         }
-        console.log(formData)
+        const res = await createTeam(formData)
+        if (res) {
+            toast({
+                title: `${res.name} created.`,
+                description: "Invite your members now.",
+                action: <ToastAction altText="Invite" onClick={() => navigate("/invitemembers")}>👋</ToastAction>
+            })
+
+        }
+
     }
 
     return (
@@ -42,7 +63,7 @@ export default function CreateTeam() {
             <h1 className="text-2xl font-bold">Create Team</h1>
             <Form {...CreateTeamForm}>
                 <form onSubmit={CreateTeamForm.handleSubmit(ivkOnSubmit)}>
-                    
+
                     <FormField
                         name="teamname"
                         control={CreateTeamForm.control}
@@ -63,7 +84,7 @@ export default function CreateTeam() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel> Team Roles </FormLabel>
-                                <div className="space-x-2">
+                                <div className="space-x-2 w-full overflow-x-auto ">
                                     {
                                         roles.current.length > 0 && roles.current.map((role, index) => (
                                             <Badge variant={"secondary"} key={role + index}>{role}
@@ -79,7 +100,7 @@ export default function CreateTeam() {
                                 </div>
                                 <FormControl>
                                     <Input type="text" placeholder="Enter Team Roles" {...field} onKeyDown={(event) => {
-                                        if (event.key === "Enter") {
+                                        if (event.key === "Enter" && field.value) {
                                             roles.current.push(field.value)
                                             CreateTeamForm.resetField("roles", {
                                                 keepDirty: true,
@@ -87,7 +108,6 @@ export default function CreateTeam() {
                                                 defaultValue: "",
                                             })
                                             event.preventDefault()
-
                                         }
                                     }} />
                                 </FormControl>
@@ -96,7 +116,16 @@ export default function CreateTeam() {
                         )}
                     />
 
-                    <Button className="mt-2" type="submit">Create Team</Button>
+                    <Button className="mt-2 font-medium text-md" variant="outline" type="submit">
+                        {
+                            creatingTeam ? "Creating Team..." :
+                                <>
+                                    <PlusCircledIcon className="mr-1" />
+                                    Create Team
+                                </>
+                        }
+                    </Button>
+
                 </form>
             </Form>
             <DevTool control={CreateTeamForm.control} />
