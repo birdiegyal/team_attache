@@ -2,8 +2,10 @@ export type createTeamArgTyp = {
     teamname: string,
     roles: string[]
 }
-export type teamOwnerTyp extends createTeamArgTyp = {
 
+export type teamMemberTyp = {
+    email: string,
+    roles: string[],
 }
 
 export type inviteMembersArgTyp = {

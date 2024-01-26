@@ -6,6 +6,7 @@ import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
 import Signin from "./_auth/forms/signin";
 import Signup from "./_auth/forms/signup";
+import InviteMembers from "./_root/pages/InviteMembers";
 
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
                     {/* private routes */}
                     <Route element={<RootLayout />}>
                         <Route index element={<CreateTeam />} />
+                        <Route path="/invitemembers" element={<InviteMembers />}/>
                     </Route>
                 </Routes >
             </main >
