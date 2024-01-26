@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateTeam, createEmailSession, createUserAc } from "../appwrite/api";
-import { globalUserAc, createTeamArgTyp, userTyp4Auth, SessionCredsTyp } from "@/types";
+import {  createTeamArgTyp, userTyp4Auth, SessionCredsTyp } from "@/types";
 import { queryKeys } from "./keys";
 
 export function createTeamMutation() {

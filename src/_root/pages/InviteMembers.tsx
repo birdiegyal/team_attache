@@ -4,9 +4,9 @@ import { Input } from "@/components/ui/input";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { useRef, MouseEvent, MouseEventHandler } from "react";
+import { useRef, MouseEventHandler } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { optional } from "zod";
+
 import { Badge } from "@/components/ui/badge";
 
 type FormValues = {
@@ -50,7 +50,7 @@ export default function InviteMembers() {
       keepTouched: true,
     })
   }
-  
+
   console.log(inviteFormArr.fields, "from the invitee")
 
   return (
