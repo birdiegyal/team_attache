@@ -8,7 +8,7 @@ export function createTeamMutation() {
         mutationFn: (args: createTeamArgTyp) => CreateTeam(args),
         /* 
          POSSIBILITIES: 
-         if we're displaying team's created by a user, we got to invaldate query responsible for getting teams from appwrite those're created by the current user.
+         if we're displaying teams created by a user, we got to invaldate query responsible for getting teams from appwrite those're created by the current user.
         */
     })
 }
@@ -36,3 +36,9 @@ export function useCreateUserSessionMutation() {
         }
     })
 }
+
+// export function inviteTeamMembersMutation() {
+//     return useMutation({
+//         mutationFn: (args: inviteMembersArgTyp[]) => (InviteMembers)
+//     })
+// }

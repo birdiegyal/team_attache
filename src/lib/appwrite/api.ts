@@ -71,7 +71,7 @@ export async function CreateTeam(args: createTeamArgTyp) {
     }
 }
 
-export async function InviteMembers(args: inviteMembersArgTyp) {
+export async function InviteMembers(members: inviteMembersArgTyp) {
     // REQUIREMENTS: 
     // got to invite members => iterate over a set of users and invite em all at once.
     // RETURN: 
@@ -79,7 +79,8 @@ export async function InviteMembers(args: inviteMembersArgTyp) {
 
     try {
         
-        const res = await teams.createMembership(args.teamId, args.roles, args.email)
+        
+        const res = await teams.createMembership(members.teamId, [members.role], members.email)
         return res
     } catch (error) {
         console.error(error)
