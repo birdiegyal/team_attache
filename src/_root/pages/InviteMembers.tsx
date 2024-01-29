@@ -64,7 +64,7 @@ export default function InviteMembers() {
               <CardDescription>Enter their Email and select their Role here.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="min-h-[40vh] max-h-[40vh] overflow-y-auto rounded-md ">
+              <div className="min-h-[30vh] max-h-[30vh] overflow-y-auto rounded-md sm:min-h-[40vh] sm:max-h-[40vh]">
                 {
                   inviteFormArr.fields.length > 0
                     ? <Table>
