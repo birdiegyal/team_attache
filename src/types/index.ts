@@ -60,3 +60,4 @@ export enum Role {
     Owner = "Owner",
     Analyst = "Analyst"
 }
+

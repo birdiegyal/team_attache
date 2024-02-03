@@ -83,7 +83,7 @@ export default function CreateTeam() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel> Team Roles </FormLabel>
-                                <div className="space-x-2 w-full overflow-x-auto ">
+                                <div className="space-x-2 w-full horizontal-scroll-shadow">
                                     {
                                         roles.current.length > 0 && roles.current.map((role, index) => (
                                             <Badge variant={"secondary"} key={role + index}>{role}

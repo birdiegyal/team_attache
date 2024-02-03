@@ -33,6 +33,7 @@
     --ring: 224 71.4% 4.1%;
  
     --radius: 0.5rem;
+    --scroll-shadow-size: 0.3rem;
   }
  
   .dark {
@@ -63,6 +64,9 @@
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
     --ring: 216 12.2% 83.9%;
+    
+    --radius: 0.5rem;
+    --scroll-shadow-size: 0.3rem;
   }
 }
  
@@ -73,4 +77,20 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+
+  .horizontal-scroll-shadow {
+    @apply flex overflow-x-auto flex-nowrap ;
+  }
+
+  /* .horizontal-scroll-shadow {
+    @apply overflow-x-auto scroll-p-3 data-[left-scroll=true]:[mask]
+  } */
+
+  .hide-scrollbar::-webkit-scrollbar {
+    @apply bg-transparent w-0 h-0
+  }
+
 }
