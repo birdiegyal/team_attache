@@ -119,10 +119,6 @@ export default function Signin() {
 
                 <p className="mt-2 text-sm font-thin">
                     Don't 've an Account?
-                    {/* 
-                     TODO: 
-                     got to add a onboard page to the link.rn im doing it with merchantsignup.
-                    */}
                     <Link
                         to="/signup"
                         className="text-green-600 text-xl ml-2 underline font-semibold"

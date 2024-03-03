@@ -1,4 +1,4 @@
-import { SessionCredsTyp, createTeamArgTyp, inviteMembersArgTyp, updateMembershipTyp, userTyp4Auth } from "@/types";
+import {  SessionCredsTyp, createTeamArgTyp, inviteMembersArgTyp, updateMembershipTyp, userTyp4Auth } from "@/types";
 import { account, appwriteConfig, avatars, databases, teams } from "./config";
 import {
     ID, Query
@@ -45,8 +45,8 @@ export async function createUserAc(user: userTyp4Auth) {
             {
                 accountId: newUserAc.$id,
                 username: newUserAc.name,
-                email: newUserAc.email,                
-                avatar: avatar,                
+                email: newUserAc.email,
+                avatar: avatar,
             })
 
         return userAc
@@ -71,20 +71,29 @@ export async function CreateTeam(args: createTeamArgTyp) {
     }
 }
 
-export async function InviteMembers(members: inviteMembersArgTyp) {
+export async function InviteMembers({ members, TeamId: teamId} :inviteMembersArgTyp ) {
+
     // REQUIREMENTS: 
     // got to invite members => iterate over a set of users and invite em all at once.
+    /* 
+     NOTE: 
+    > should be able to tell what invite reqs failed and what invitations re succesfully done.
+    > currently's only able to invite members to a single team.
+     WORKFLOW: 
+    we'll build an obj of type InvitationReturnTyp[] that mentions all of the details required.
+    */
     // RETURN: 
-    // Membership model from team.createMembership()
+    // PromiseSet<InvitationReturnTyp>
+    const res = new Set()
 
-    try {
-        
-        
-        const res = await teams.createMembership(members.teamId, [members.role], members.email)
-        return res
-    } catch (error) {
-        console.error(error)
+    for (let member of members) {
+        const url = "http://localhost:5173/acceptinvite"
+        const ans = await teams.createMembership(teamId, [member.roles], member.email, undefined, undefined, url)
+        res.add(ans)
     }
+
+    return Promise.allSettled(res)
+
 }
 
 export async function UpdateMembershipStatus(args: updateMembershipTyp) {
@@ -110,3 +119,14 @@ export async function createEmailSession(sessionCreds: SessionCredsTyp) {
         return null
     }
 }
+
+export async function getTeams() {
+    try {
+        const teamslist = await teams.list()
+        return teamslist
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
+

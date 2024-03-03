@@ -7,12 +7,13 @@ import RootLayout from "./_root/RootLayout";
 import Signin from "./_auth/forms/signin";
 import Signup from "./_auth/forms/signup";
 import InviteMembers from "./_root/pages/InviteMembers";
+import AcceptInvitation from "./_root/pages/AcceptInvitation";
 
 
 export default function App() {
     return (
         <>
-            <main className="flex w-full h-screen ">
+            <main className="w-screen">
                 <Routes>
                     {/* public routes */}
                     <Route element={<AuthLayout />}>
@@ -24,6 +25,7 @@ export default function App() {
                     <Route element={<RootLayout />}>
                         <Route index element={<CreateTeam />} />
                         <Route path="/invitemembers" element={<InviteMembers />}/>
+                        <Route path="/acceptinvite" element={<AcceptInvitation/>}/>
                     </Route>
                 </Routes >
             </main >

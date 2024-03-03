@@ -14,6 +14,7 @@ import { createTeamMutation } from "@/lib/queries/queries";
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@radix-ui/react-toast";
 import { useNavigate } from "react-router-dom";
+import useTeamsProvider from "@/contexts/TeamsProvider";
 
 const CreateTeamSchema = zod.object({
     teamname: zod.string().max(100, { message: "teamName characters limit exceeds." }).min(1, { message: "team name couldn't be empty." }),
@@ -26,7 +27,7 @@ export default function CreateTeam() {
 
     const navigate = useNavigate()
     const { toast } = useToast()
-
+    const { updateCurrentTeamname: updateTeamname } = useTeamsProvider()
     const roles = useRef<string[]>([])
 
     const CreateTeamForm = useForm<CreateTeamType>({
@@ -45,13 +46,36 @@ export default function CreateTeam() {
             ...formData,
             roles: roles.current
         }
-        const res = await createTeam(formData)
-        if (res) {
+
+        try {
+
+            const res = await createTeam(formData)
+
+            const TeamId = res?.$id || ""
+
+            //  NOTE:  adding TeamId against the teamname inside the local storage.
+            const Teamname = formData.teamname
+
+            if (TeamId !== "" ) {
+                localStorage.setItem(Teamname, TeamId)
+            }
+
+            updateTeamname(() => Teamname)
+            
             toast({
-                title: `${res.name} created.`,
+                title: `${Teamname} created.`,
                 description: "Invite your members now.",
-                action: <ToastAction altText="Invite" onClick={() => navigate("/invitemembers")}>👋</ToastAction>
+                action: <ToastAction altText="Invite" onClick={() => navigate("/invitemembers")} className="border-2">👋</ToastAction>
             })
+
+        } catch (error) {
+
+            const Teamname = formData.teamname
+            toast({
+                title: `Couldn't create ${Teamname}.`,
+                description: "Check your internet connection"
+            })
+            console.log(error)
 
         }
 
@@ -136,12 +160,14 @@ export default function CreateTeam() {
  WORKFLOW: 
  1. lay down the ui for creating a team.
   TODO: 
-  🎯 get the schema.
-  🎯 plug in the useForm hook from react-hook-form.
-  🎯 impl the form  NOTE:  we're not concerned with the visual aspect but the sizing and layout got to be on point.
+  ✅ get the schema.
+  ✅ plug in the useForm hook from react-hook-form.
+  ✅ impl the form  NOTE:  we're not concerned with the visual aspect but the sizing and layout got to be on point.
   
  2. connect the ui with the logic.
   TODO: 
-  🎯 impl appwrite api.
-  🎯 queries
+  ✅ impl appwrite api.
+  ✅ queries
+
+ 3. update the teamId with the id returned from the res.
 */

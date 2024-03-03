@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from "./contexts/ThemeProvider"
 import { QueryProvider } from './contexts/QueryProvider'
 import { AuthProvider } from './contexts/AuthProvider'
+import { TeamsProvider } from './contexts/TeamsProvider'
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryProvider>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
           <AuthProvider>
-            <App />
+            <TeamsProvider>
+              <App />
+            </TeamsProvider>
           </AuthProvider>
         </ThemeProvider>
       </QueryProvider>

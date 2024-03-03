@@ -12,8 +12,6 @@ export const initVal: globalUserAc = {
     accountId: ""
 }
 
-type React = typeof React
-
 export const initState = {
     user: initVal,
     isLoading: false,

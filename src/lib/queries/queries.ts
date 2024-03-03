@@ -1,11 +1,17 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CreateTeam, createEmailSession, createUserAc } from "../appwrite/api";
-import {  createTeamArgTyp, userTyp4Auth, SessionCredsTyp } from "@/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CreateTeam, InviteMembers, createEmailSession, createUserAc, getTeams } from "../appwrite/api";
+import {  createTeamArgTyp, userTyp4Auth, SessionCredsTyp, inviteMembersArgTyp } from "@/types";
 import { queryKeys } from "./keys";
 
 export function createTeamMutation() {
+    const queryClient = useQueryClient()
     return useMutation({
         mutationFn: (args: createTeamArgTyp) => CreateTeam(args),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [queryKeys.GET_TEAMS]
+            })
+        }
         /* 
          POSSIBILITIES: 
          if we're displaying teams created by a user, we got to invaldate query responsible for getting teams from appwrite those're created by the current user.
@@ -37,8 +43,16 @@ export function useCreateUserSessionMutation() {
     })
 }
 
-// export function inviteTeamMembersMutation() {
-//     return useMutation({
-//         mutationFn: (args: inviteMembersArgTyp[]) => (InviteMembers)
-//     })
-// }
+export function inviteTeamMembersMutation() {
+    return useMutation({
+        mutationFn: ({ members, TeamId: teamId }: inviteMembersArgTyp) => (InviteMembers({members, TeamId: teamId}))
+    })
+}
+
+export function getTeamsForCurrentUSer() {
+    return useQuery({
+        queryKey: [queryKeys.GET_TEAMS,],
+        queryFn: getTeams,
+    })
+}
+
