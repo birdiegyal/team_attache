@@ -65,8 +65,10 @@ export default function InviteMembers() {
     updateCurrentTeamname,
     updateTeams,
   } = useTeamsProvider();
+
   const { toast } = useToast();
   const _i = useRef<number>(0);
+
   const inviteForm = useForm<FormValues>({
     defaultValues: { email: "" },
     mode: "onTouched",
