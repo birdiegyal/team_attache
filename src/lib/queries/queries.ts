@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CreateTeam, InviteMembers, createEmailSession, createUserAc, getTeams } from "../appwrite/api";
+import { CreateTeam, InviteMembers, createEmailSession, createUserAc, getImagesForDemo1, getTeams } from "../appwrite/api";
 import {  createTeamArgTyp, userTyp4Auth, SessionCredsTyp, inviteMembersArgTyp } from "@/types";
 import { queryKeys } from "./keys";
 
@@ -53,6 +53,13 @@ export function getTeamsForCurrentUSer() {
     return useQuery({
         queryKey: [queryKeys.GET_TEAMS,],
         queryFn: getTeams,
+    })
+}
+
+export function getImgsPreviewFishbone() {
+    return useQuery({
+        queryKey: [queryKeys.GET_IMGS_FISHBONE,],
+        queryFn: getImagesForDemo1,
     })
 }
 

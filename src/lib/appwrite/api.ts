@@ -1,5 +1,5 @@
 import {  SessionCredsTyp, createTeamArgTyp, inviteMembersArgTyp, updateMembershipTyp, userTyp4Auth } from "@/types";
-import { account, appwriteConfig, avatars, databases, teams } from "./config";
+import { account, appwriteConfig, avatars, databases, storage, teams } from "./config";
 import {
     ID, Query
 } from 'appwrite'
@@ -86,7 +86,7 @@ export async function InviteMembers({ members, TeamId: teamId} :inviteMembersArg
     // PromiseSet<InvitationReturnTyp>
     const res = new Set()
 
-    for (let member of members) {
+    for (const member of members) {
         const url = "http://localhost:5173/acceptinvite"
         const ans = await teams.createMembership(teamId, [member.roles], member.email, undefined, undefined, url)
         res.add(ans)
@@ -130,3 +130,29 @@ export async function getTeams() {
     }
 }
 
+export async function getImagesForDemo1() {
+
+    /*
+      WORKFLOW: 
+     1. we'll get the list of all the files within the bucket using a query for *.jpg
+     2. then we'll iterate throught the same arr to get the fileid for preview.
+     3. we'll get the preview links within array to return.    
+    */
+    try {
+        
+        const {files, total} = await storage.listFiles(appwriteConfig.bucketId, undefined, "*.jpg")
+        const imgPreviews = []
+        
+        for (const file of files) {
+            const imgPreview = storage.getFilePreview(appwriteConfig.bucketId, file.$id, 400, 400, "top",  60)
+            imgPreviews.push(imgPreview)
+        }
+        
+        return {imgPreviews, total}
+        
+    } catch (error) {
+        console.error(error)
+        return null
+        
+    }
+}

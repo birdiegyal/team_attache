@@ -6,4 +6,6 @@ export enum queryKeys {
     // doc retrieval
     GET_CURRENT_USER = "getCurrentUser",
     GET_TEAMS = "getTeams",
+    GET_IMGS_FISHBONE = "getImgsFromFishbone",
+    
 }
