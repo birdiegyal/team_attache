@@ -270,13 +270,13 @@ function RoleDropDownMenu({
   ivkOnClickToChangeRole,
   index,
 }: RoleDropdownMenuPropsTyp) {
-  console.log(field);
+  console.log("field looks like this: ", field);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="p-[1px] px-2 font-light">
           {/* @ts-ignore */}
-          {field.role ? field.role : "No Role"}
+          {field.roles || "member"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-11">
@@ -285,13 +285,16 @@ function RoleDropDownMenu({
         {Object.keys(TeamRole).map((role, _i) => (
           <DropdownMenuCheckboxItem
             key={`${_i}th_item`}
-            onCheckedChange={() =>
+            textValue={role}
+            onCheckedChange={() => {
+              console.log(role, "role at this point")
               ivkOnClickToChangeRole(index, {
                 // @ts-ignore
                 email: field.email,
-                role: role,
+                roles: role,
                 fieldId: field.id,
               })
+            }
             }
           >
             {role}

@@ -93,3 +93,9 @@ export interface PermissionControlForResource {
     teamId: string,
     role: string,
 }
+
+
+export type SettingsArgs = {
+    [key in  Role]: OperationType[]
+}
+

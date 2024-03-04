@@ -171,12 +171,13 @@ export async function getImagesForDemo1() {
       undefined,
       "*.jpg"
     );
+    console.log(files, total);
 
     const imgPreviews: string[] = [];
 
     for (const file of files) {
       console.log(file);
-      const imgPreview = fishboneStorage.getFilePreview(
+      const imgPreview = await fishboneStorage.getFilePreview(
         appwriteConfig.fishboneBucketId,
         file.$id,
         400,
@@ -184,12 +185,12 @@ export async function getImagesForDemo1() {
         "top",
         60
       );
-      console.log(imgPreview);
       imgPreviews.push(imgPreview.toString());
     }
 
     return { imgPreviews, total };
   } catch (error) {
+    console.log("oh shit!!");
     console.error(error);
     return null;
   }
@@ -223,6 +224,7 @@ export async function updatePermissionsForResources(
           undefined,
           [Permission.delete(Role.team(args.teamId, args.role))]
         );
+        break
 
       case OperationType.Read:
         res = fishboneStorage.updateFile(
@@ -231,6 +233,7 @@ export async function updatePermissionsForResources(
           undefined,
           [Permission.read(Role.team(args.teamId, args.role))]
         );
+        break
       case OperationType.Update:
         res = fishboneStorage.updateFile(
           appwriteConfig.fishboneBucketId,
@@ -238,6 +241,7 @@ export async function updatePermissionsForResources(
           undefined,
           [Permission.update(Role.team(args.teamId, args.role))]
         );
+        break
       case OperationType.Write: // grant create, update, and delete access
         res = fishboneStorage.updateFile(
           appwriteConfig.fishboneBucketId,
@@ -245,11 +249,22 @@ export async function updatePermissionsForResources(
           undefined,
           [Permission.write(Role.team(args.teamId, args.role))]
         );
+        break
     }
 
     return res;
   } catch (error) {
     console.error(error);
     return null;
+  }
+}
+
+export async function getTeamMembers(teamId: string) {
+  try {
+    const teamMembers = await teams.listMemberships(teamId)
+    return teamMembers
+  } catch (error) {
+    console.error(error)
+    return null
   }
 }

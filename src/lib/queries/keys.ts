@@ -7,5 +7,5 @@ export enum queryKeys {
     GET_CURRENT_USER = "getCurrentUser",
     GET_TEAMS = "getTeams",
     GET_IMGS_FISHBONE = "getImgsFromFishbone",
-    
+    GET_TEAM_MEMBERSHIP = "getTeamMembership",
 }
