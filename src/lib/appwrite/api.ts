@@ -1,7 +1,7 @@
-import {  SessionCredsTyp, createTeamArgTyp, inviteMembersArgTyp, updateMembershipTyp, userTyp4Auth } from "@/types";
-import { account, appwriteConfig, avatars, databases, teams } from "./config";
+import { SessionCredsTyp, createTeamArgTyp, inviteMembersArgTyp, updateMembershipTyp, userTyp4Auth, OperationType, PermissionControlForResource } from "@/types";
+import { account, appwriteConfig, avatars, databases, storage, teams } from "./config";
 import {
-    ID, Query
+    ID, Permission, Query, Role
 } from 'appwrite'
 
 export async function getCurrentUser() {
@@ -71,7 +71,7 @@ export async function CreateTeam(args: createTeamArgTyp) {
     }
 }
 
-export async function InviteMembers({ members, TeamId: teamId} :inviteMembersArgTyp ) {
+export async function InviteMembers({ members, TeamId: teamId }: inviteMembersArgTyp) {
 
     // REQUIREMENTS: 
     // got to invite members => iterate over a set of users and invite em all at once.
@@ -130,3 +130,71 @@ export async function getTeams() {
     }
 }
 
+export async function getImagesForDemo1() {
+
+    /*
+      WORKFLOW: 
+     1. we'll get the list of all the files within the bucket using a query for *.jpg
+     2. then we'll iterate throught the same arr to get the fileid for preview.
+     3. we'll get the preview links within array to return.    
+    */
+    try {
+
+        const { files, total } = await storage.listFiles(appwriteConfig.bucketId, undefined, "*.jpg")
+        const imgPreviews = []
+
+        for (const file of files) {
+            const imgPreview = storage.getFilePreview(appwriteConfig.bucketId, file.$id, 400, 400, "top", 60)
+            imgPreviews.push(imgPreview)
+        }
+
+        return { imgPreviews, total }
+
+    } catch (error) {
+        console.error(error)
+        return null
+
+    }
+}
+
+
+export async function updatePermissionsForResources(args: PermissionControlForResource) {
+
+    /*
+      NOTE:  this f() is to update the permissions for a single resource.
+    */
+
+    /*
+      WORKFLOW: 
+     1. get the file id for the Resrc.
+     2. get the role and the team id to update the permissions and the operation type.
+    */
+
+     /*
+      POSSIBILITIES: 
+     1. may be we need to assign multiple privileges like read and write. in that case we got to call this method for individual privileges.
+     */
+    let res
+
+    try {
+        switch (args.operationType) {
+            case OperationType.Delete:
+                res = storage.updateFile(appwriteConfig.bucketId, args.fileId, undefined, [Permission.delete(Role.team(args.teamId, args.role)),])
+
+            case OperationType.Read:
+                res = storage.updateFile(appwriteConfig.bucketId, args.fileId, undefined, [Permission.read(Role.team(args.teamId, args.role)),])
+            case OperationType.Update:
+                res = storage.updateFile(appwriteConfig.bucketId, args.fileId, undefined, [Permission.update(Role.team(args.teamId, args.role)),])
+            case OperationType.Write: // grant create, update, and delete access
+               res = storage.updateFile(appwriteConfig.bucketId, args.fileId, undefined, [Permission.write(Role.team(args.teamId, args.role)),])
+        }
+        
+        return res
+
+        
+    } catch (error) {
+        console.error(error)
+        return null
+
+    }
+}
