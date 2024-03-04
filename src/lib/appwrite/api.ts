@@ -1,200 +1,252 @@
-import { SessionCredsTyp, createTeamArgTyp, inviteMembersArgTyp, updateMembershipTyp, userTyp4Auth, OperationType, PermissionControlForResource } from "@/types";
-import { account, appwriteConfig, avatars, databases, storage, teams } from "./config";
 import {
-    ID, Permission, Query, Role
-} from 'appwrite'
+  SessionCredsTyp,
+  createTeamArgTyp,
+  inviteMembersArgTyp,
+  updateMembershipTyp,
+  userTyp4Auth,
+  OperationType,
+  PermissionControlForResource,
+} from "@/types";
+import {
+  account,
+  appwriteConfig,
+  avatars,
+  databases,
+  fishboneStorage,
+  teams,
+} from "./config";
+import { ID, Permission, Query, Role } from "appwrite";
 
 export async function getCurrentUser() {
-    try {
-        const currentUser = await account.get()
-        if (!currentUser) throw Error
+  try {
+    const currentUser = await account.get();
+    if (!currentUser) throw Error;
 
-        const currentUserDoc = await databases.listDocuments(
-            appwriteConfig.dbId,
-            appwriteConfig.usersColl,
-            [Query.equal("accountId", currentUser.$id)]
-        )
+    const currentUserDoc = await databases.listDocuments(
+      appwriteConfig.dbId,
+      appwriteConfig.usersColl,
+      [Query.equal("accountId", currentUser.$id)]
+    );
 
-        if (!currentUserDoc) throw Error
+    if (!currentUserDoc) throw Error;
 
-        return currentUserDoc.documents[0]
-
-    } catch (error) {
-        console.error(error)
-        return false
-    }
+    return currentUserDoc.documents[0];
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 }
 
 export async function createUserAc(user: userTyp4Auth) {
-    try {
-        const newUserAc = await account.create(
-            ID.unique(),
-            user.email,
-            user.password,
-            user.username
-        )
+  try {
+    const newUserAc = await account.create(
+      ID.unique(),
+      user.email,
+      user.password,
+      user.username
+    );
 
-        if (!newUserAc) throw Error
+    if (!newUserAc) throw Error;
 
-        const avatar = avatars.getInitials(user.username, 60, 60)
+    const avatar = avatars.getInitials(user.username, 60, 60);
 
-        const userAc = await databases.createDocument(
-            appwriteConfig.dbId,
-            appwriteConfig.usersColl,
-            ID.unique(),
-            {
-                accountId: newUserAc.$id,
-                username: newUserAc.name,
-                email: newUserAc.email,
-                avatar: avatar,
-            })
+    const userAc = await databases.createDocument(
+      appwriteConfig.dbId,
+      appwriteConfig.usersColl,
+      ID.unique(),
+      {
+        accountId: newUserAc.$id,
+        username: newUserAc.name,
+        email: newUserAc.email,
+        avatar: avatar,
+      }
+    );
 
-        return userAc
-
-    } catch (error) {
-        console.error(error);
-        return null
-    }
+    return userAc;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
 
 export async function CreateTeam(args: createTeamArgTyp) {
-    // REQUIREMENTS: 
-    // got to create a team with defined roles
-    // RETURN: 
-    // Team model from team.create()
+  // REQUIREMENTS:
+  // got to create a team with defined roles
+  // RETURN:
+  // Team model from team.create()
 
-    try {
-        const res = await teams.create(ID.unique(), args.teamname, args.roles)
-        return res
-    } catch (error) {
-        console.error(error)
-    }
+  try {
+    const res = await teams.create(ID.unique(), args.teamname, args.roles);
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-export async function InviteMembers({ members, TeamId: teamId }: inviteMembersArgTyp) {
-
-    // REQUIREMENTS: 
-    // got to invite members => iterate over a set of users and invite em all at once.
-    /* 
+export async function InviteMembers({
+  members,
+  TeamId: teamId,
+}: inviteMembersArgTyp) {
+  // REQUIREMENTS:
+  // got to invite members => iterate over a set of users and invite em all at once.
+  /* 
      NOTE: 
     > should be able to tell what invite reqs failed and what invitations re succesfully done.
     > currently's only able to invite members to a single team.
      WORKFLOW: 
     we'll build an obj of type InvitationReturnTyp[] that mentions all of the details required.
     */
-    // RETURN: 
-    // PromiseSet<InvitationReturnTyp>
-    const res = new Set()
+  // RETURN:
+  // PromiseSet<InvitationReturnTyp>
+  const res = new Set();
 
-    for (let member of members) {
-        const url = "http://localhost:5173/acceptinvite"
-        const ans = await teams.createMembership(teamId, [member.roles], member.email, undefined, undefined, url)
-        res.add(ans)
-    }
+  for (let member of members) {
+    const url = "http://localhost:5173/acceptinvite";
+    const ans = await teams.createMembership(
+      teamId,
+      [member.roles],
+      member.email,
+      undefined,
+      undefined,
+      url
+    );
+    res.add(ans);
+  }
 
-    return Promise.allSettled(res)
-
+  return Promise.allSettled(res);
 }
 
 export async function UpdateMembershipStatus(args: updateMembershipTyp) {
-    // REQUIREMENTS: 
-    // got to update the membership status when the user's redirected to the url specified in the InviteMembers().
-    // RETURN: 
-    // Membership model from team.updateMembershipStatus()
+  // REQUIREMENTS:
+  // got to update the membership status when the user's redirected to the url specified in the InviteMembers().
+  // RETURN:
+  // Membership model from team.updateMembershipStatus()
 
-    try {
-        const res = await teams.updateMembershipStatus(args.teamId, args.membershipId, args.userId, args.secret)
-        return res
-    } catch (error) {
-        console.error(error)
-    }
+  try {
+    const res = await teams.updateMembershipStatus(
+      args.teamId,
+      args.membershipId,
+      args.userId,
+      args.secret
+    );
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 export async function createEmailSession(sessionCreds: SessionCredsTyp) {
-    try {
-        const session = await account.createEmailSession(sessionCreds.email, sessionCreds.password)
-        return session
-    } catch (error) {
-        console.error(error)
-        return null
-    }
+  try {
+    const session = await account.createEmailSession(
+      sessionCreds.email,
+      sessionCreds.password
+    );
+    return session;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
 
 export async function getTeams() {
-    try {
-        const teamslist = await teams.list()
-        return teamslist
-    } catch (error) {
-        console.error(error)
-        return null
-    }
+  try {
+    const teamslist = await teams.list();
+    return teamslist;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
 
 export async function getImagesForDemo1() {
-
-    /*
+  /*
       WORKFLOW: 
      1. we'll get the list of all the files within the bucket using a query for *.jpg
      2. then we'll iterate throught the same arr to get the fileid for preview.
      3. we'll get the preview links within array to return.    
     */
-    try {
+  try {
+    const { files, total } = await fishboneStorage.listFiles(
+      appwriteConfig.bucketId,
+      undefined,
+      "*.jpg"
+    );
+    const imgPreviews = [];
 
-        const { files, total } = await storage.listFiles(appwriteConfig.bucketId, undefined, "*.jpg")
-        const imgPreviews = []
-
-        for (const file of files) {
-            const imgPreview = storage.getFilePreview(appwriteConfig.bucketId, file.$id, 400, 400, "top", 60)
-            imgPreviews.push(imgPreview)
-        }
-
-        return { imgPreviews, total }
-
-    } catch (error) {
-        console.error(error)
-        return null
-
+    for (const file of files) {
+      const imgPreview = fishboneStorage.getFilePreview(
+        appwriteConfig.bucketId,
+        file.$id,
+        400,
+        400,
+        "top",
+        60
+      );
+      imgPreviews.push(imgPreview);
     }
+
+    return { imgPreviews, total };
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
 
-
-export async function updatePermissionsForResources(args: PermissionControlForResource) {
-
-    /*
+export async function updatePermissionsForResources(
+  args: PermissionControlForResource
+) {
+  /*
       NOTE:  this f() is to update the permissions for a single resource.
     */
 
-    /*
+  /*
       WORKFLOW: 
      1. get the file id for the Resrc.
      2. get the role and the team id to update the permissions and the operation type.
     */
 
-     /*
+  /*
       POSSIBILITIES: 
      1. may be we need to assign multiple privileges like read and write. in that case we got to call this method for individual privileges.
      */
-    let res
+  let res;
 
-    try {
-        switch (args.operationType) {
-            case OperationType.Delete:
-                res = storage.updateFile(appwriteConfig.bucketId, args.fileId, undefined, [Permission.delete(Role.team(args.teamId, args.role)),])
+  try {
+    switch (args.operationType) {
+      case OperationType.Delete:
+        res = fishboneStorage.updateFile(
+          appwriteConfig.bucketId,
+          args.fileId,
+          undefined,
+          [Permission.delete(Role.team(args.teamId, args.role))]
+        );
 
-            case OperationType.Read:
-                res = storage.updateFile(appwriteConfig.bucketId, args.fileId, undefined, [Permission.read(Role.team(args.teamId, args.role)),])
-            case OperationType.Update:
-                res = storage.updateFile(appwriteConfig.bucketId, args.fileId, undefined, [Permission.update(Role.team(args.teamId, args.role)),])
-            case OperationType.Write: // grant create, update, and delete access
-               res = storage.updateFile(appwriteConfig.bucketId, args.fileId, undefined, [Permission.write(Role.team(args.teamId, args.role)),])
-        }
-        
-        return res
-
-        
-    } catch (error) {
-        console.error(error)
-        return null
-
+      case OperationType.Read:
+        res = fishboneStorage.updateFile(
+          appwriteConfig.bucketId,
+          args.fileId,
+          undefined,
+          [Permission.read(Role.team(args.teamId, args.role))]
+        );
+      case OperationType.Update:
+        res = fishboneStorage.updateFile(
+          appwriteConfig.bucketId,
+          args.fileId,
+          undefined,
+          [Permission.update(Role.team(args.teamId, args.role))]
+        );
+      case OperationType.Write: // grant create, update, and delete access
+        res = fishboneStorage.updateFile(
+          appwriteConfig.bucketId,
+          args.fileId,
+          undefined,
+          [Permission.write(Role.team(args.teamId, args.role))]
+        );
     }
+
+    return res;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
