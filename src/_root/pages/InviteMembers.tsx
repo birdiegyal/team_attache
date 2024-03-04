@@ -1,4 +1,4 @@
-import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { PaperPlaneIcon } from "@radix-ui/react-icons";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
@@ -276,7 +276,7 @@ function RoleDropDownMenu({
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="p-[1px] px-2 font-light">
           {/* @ts-ignore */}
-          {field.roles}
+          {field.role ? field.role : "No Role"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-11">
@@ -309,8 +309,8 @@ function TeamDropDownMenu({
 }: Pick<TeamsContextTyp, "Teams" | "updateCurrentTeamname"> & {
   isGettingTeams: boolean;
 }) {
-  console.log(Teams.teams);
-
+  console.log("team selected", Teams.teams);
+  const { toast } = useToast();
   function ivkOnClickToChangeTeam(teamname: string) {
     updateCurrentTeamname(() => teamname);
   }
@@ -323,8 +323,11 @@ function TeamDropDownMenu({
             Loading...
           </span>
         ) : (
-          <p className="px-2 text-lg text-wrap underline underline-offset-2 ">
+          <p className="px-2 text-lg text-wrap underline underline-offset-2  flex justify-start items-center">
             Select your Team 🫂 to Invite Members
+            <Button variant="outline" size="icon" className="h-6 w-6 mx-3 mt-2">
+              <ChevronDownIcon className="h-3 w-3" />
+            </Button>
           </p>
         )}
       </DropdownMenuTrigger>
@@ -334,6 +337,11 @@ function TeamDropDownMenu({
         {Teams.teams.map((team, _i) => (
           <DropdownMenuCheckboxItem
             key={`${_i}th_item`}
+            onClick={() => {
+              toast({
+                title: `${team.name} selcted`,
+              });
+            }}
             onCheckedChange={() => ivkOnClickToChangeTeam(team.name)}
           >
             {team.name}

@@ -1,6 +1,10 @@
+import { Input } from "@/components/ui/input";
+
 export default function PasswordRecovery() {
     return (
-
+      <Input
+        type="password"
+        />
     )
 }
 

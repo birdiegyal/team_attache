@@ -79,4 +79,17 @@ export interface TeamsContextTyp {
     updateTeams: Dispatch<SetStateAction<Models.TeamList<TeamPreferences>>>,
 }
 
+export enum OperationType {
+    Read = "read",
+    Write = "write", // grant create, update, and delete access
+    Update = "update",
+    Delete = "delete",
 
+}
+
+export interface PermissionControlForResource {
+    fileId: string,
+    operationType: OperationType, // going to use a enum here
+    teamId: string,
+    role: string,
+}
