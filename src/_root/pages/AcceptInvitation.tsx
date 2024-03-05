@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+
 import {
   Dialog,
   DialogContent,
@@ -16,30 +16,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { teams } from "@/lib/appwrite/config";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { useFieldArray, useForm } from "react-hook-form";
-import {
-  FormValues,
-  Role,
-  RoleDropdownMenuPropsTyp,
-  TeamsContextTyp,
-} from "@/types";
+
+
+import * as z from "zod"
 
 interface AcceptInvitationProps extends URLSearchParams {
   userId: string;
@@ -55,6 +44,7 @@ export default function AcceptInvitation() {
   const [teamName, setTeamname] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
   const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("")
 
   const params = new Proxy(
     new URLSearchParams(window.location.search) as AcceptInvitationProps,
@@ -72,8 +62,11 @@ export default function AcceptInvitation() {
 
   useEffect(() => {
     if (teamId) {
+      console.log("inside the effect: ", teamId)
       teams.get(teamId).then(({ name }) => setTeamname(name));
+      teams.getMembership(teamId, membershipId).then((membership) => setEmail(membership.userEmail))
     } // this way we couldnt access the team's unneccesary details that we get while teams.get(...)
+
   }, [teamId]);
 
   //  NOTE:  so we're going to get all the required info for accepting a team invite from the url | magic link sent to the email.
@@ -130,9 +123,8 @@ export default function AcceptInvitation() {
         <Card className="px-1 mx-1 sm:w-1/2 lg:1/3">
           <CardHeader className="py-4">
             <CardTitle>Woah 😃, Team Invitation!</CardTitle>
-            <CardDescription>{`You've been invited to be a part of ${
-              teamName || "a new Team"
-            }.`}</CardDescription>
+            <CardDescription>{`You've been invited to be a part of ${teamName || "a new Team"
+              }.`}</CardDescription>
           </CardHeader>
           <Separator className="mb-2" />
           <CardContent>
@@ -174,7 +166,7 @@ export default function AcceptInvitation() {
                   To accept the invitation, you need to register first.
                 </DialogDescription>
               </DialogHeader>
-              <ProfileForm />
+              <ProfileForm email={email} closeDialog={setOpen} />
             </DialogContent>
           </Dialog>
         </div>
@@ -183,24 +175,54 @@ export default function AcceptInvitation() {
   );
 }
 
-function ProfileForm({ className }: React.ComponentProps<"form">) {
+const PasswordRecoverySchema = z.object({
+  password: z.string()
+})
+
+function ProfileForm({ email, closeDialog }: { email: string, closeDialog: Function }) {
+
+  console.log("email: ", email)
+  const PasswordRecoveryForm = useForm({
+    resolver: zodResolver(PasswordRecoverySchema),
+    defaultValues: {
+      password: "",
+    }
+  })
+
+  async function onSubmit(formData: { password: string }) {
+    console.log("email", email)
+    console.log(formData)
+    closeDialog(false)
+  }
+
   return (
-    <form className={cn("grid items-start gap-4", className)}>
-      <div className="grid gap-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          type="email"
-          id="email"
-          defaultValue="chimanshu458@gmail.com"
-          disabled
+    <Form {...PasswordRecoveryForm}>
+      <form className={"grid items-start gap-4"} onSubmit={PasswordRecoveryForm.handleSubmit(onSubmit)}>
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            type="email"
+            id="email"
+            defaultValue={email}
+            disabled
+          />
+        </div>
+        <FormField
+          key={"password"}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="password">Password</Label>
-        <Input type="password" id="username" defaultValue="" />
-      </div>
-      <Button type="submit">Register</Button>
-    </form>
+        <Button type="submit">Register</Button>
+      </form>
+    </Form>
   );
 }
 /* 

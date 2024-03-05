@@ -76,8 +76,19 @@ export async function CreateTeam(args: createTeamArgTyp) {
   // Team model from team.create()
 
   try {
-    const res = await teams.create(ID.unique(), args.teamname, args.roles);
-    return res;
+    const res = await teams.create(ID.unique(), args.teamname);
+
+    if (res) {
+      const setPreferences = await teams.updatePrefs(res.$id, {
+        roles: args.roles,
+      });
+
+      if (setPreferences) {
+        return res;
+      } else {
+        throw new Error();
+      }
+    }
   } catch (error) {
     console.error(error);
   }
@@ -224,7 +235,7 @@ export async function updatePermissionsForResources(
           undefined,
           [Permission.delete(Role.team(args.teamId, args.role))]
         );
-        break
+        break;
 
       case OperationType.Read:
         res = fishboneStorage.updateFile(
@@ -233,7 +244,7 @@ export async function updatePermissionsForResources(
           undefined,
           [Permission.read(Role.team(args.teamId, args.role))]
         );
-        break
+        break;
       case OperationType.Update:
         res = fishboneStorage.updateFile(
           appwriteConfig.fishboneBucketId,
@@ -241,7 +252,7 @@ export async function updatePermissionsForResources(
           undefined,
           [Permission.update(Role.team(args.teamId, args.role))]
         );
-        break
+        break;
       case OperationType.Write: // grant create, update, and delete access
         res = fishboneStorage.updateFile(
           appwriteConfig.fishboneBucketId,
@@ -249,7 +260,7 @@ export async function updatePermissionsForResources(
           undefined,
           [Permission.write(Role.team(args.teamId, args.role))]
         );
-        break
+        break;
     }
 
     return res;
@@ -261,10 +272,19 @@ export async function updatePermissionsForResources(
 
 export async function getTeamMembers(teamId: string) {
   try {
-    const teamMembers = await teams.listMemberships(teamId)
-    return teamMembers
+    const teamMembers = await teams.listMemberships(teamId);
+    return teamMembers;
   } catch (error) {
-    console.error(error)
-    return null
+    console.error(error);
+    return null;
   }
 }
+
+// export async function getAllCollections() {
+//   try {
+//     const colls = await databases.
+//   } catch (error) {
+//     console.error(error);
+//     return null;
+//   }
+// }

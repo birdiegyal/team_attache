@@ -33,11 +33,11 @@ export default function App() {
             <Route path="/acceptinvite" element={<AcceptInvitation />} />
             <Route path="/demo1" element={<Demo1 />} />
             <Route path="/settings" element={<Settings />} />
-
             <Route path="/collections" element={<Collections />} />
             <Route path="/collections/:id" element={<FileDetails />} />
             <Route path="/userData" element={<UserShowData />} />
             <Route path="/userData/:uid" element={<UserFileDetails />} />
+            
           </Route>
         </Routes>
       </main>
