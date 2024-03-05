@@ -20,19 +20,13 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface FileDetailsProps {
   fileId: string;
@@ -40,6 +34,7 @@ interface FileDetailsProps {
 
 export const FileDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   console.log("Users details", id);
   const [assetData, setAssetData] = useState([
     { id: 1, title: "cone.jpg" },
@@ -53,16 +48,32 @@ export const FileDetails = () => {
     );
   };
 
+  const handleRedirect = () => {
+    navigate("/collectionSettings");
+  };
+
   return (
     <div className="flex flex-col gap-4 mt-4 mx-2 sm:w-2/3 sm:mx-auto md:w-1/2">
       <Card className="rounded-md">
-        <CardHeader>
-          <CardTitle className="text-4xl">
-            <span className="text-2xl text-gray-300">Collection ID:</span> {id}
-          </CardTitle>
-          <CardDescription>
-            You can edit privileges and permissions of the data.
-          </CardDescription>
+        <CardHeader className="flex justify-between items-center flex-row">
+          <div>
+            <CardTitle className="text-4xl">
+              <span className="text-2xl text-gray-300">Collection ID:</span>{" "}
+              {id}
+            </CardTitle>
+            <CardDescription>
+              You can edit privileges and permissions of the data.
+            </CardDescription>
+          </div>
+          <div>
+            <Button
+              variant="outline"
+              className="px-4 py-1"
+              onClick={handleRedirect}
+            >
+              Settings
+            </Button>
+          </div>
         </CardHeader>
         <Separator className="my-4" />
         <CardContent>

@@ -16,16 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -33,13 +24,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { teams } from "@/lib/appwrite/config";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useFieldArray, useForm } from "react-hook-form";
+import { set, useFieldArray, useForm } from "react-hook-form";
 import {
   FormValues,
   Role,
   RoleDropdownMenuPropsTyp,
   TeamsContextTyp,
 } from "@/types";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
 interface AcceptInvitationProps extends URLSearchParams {
   userId: string;
@@ -91,7 +83,7 @@ export default function AcceptInvitation() {
           description: `You're officially a part of ${teamName}.All the best for your journey. 💪`,
         });
 
-        navigate("/");
+        navigate("/userData");
       } else {
         toast({
           title: "Couldn't accept invitation! 😖",
@@ -99,6 +91,11 @@ export default function AcceptInvitation() {
         });
       }
     } catch (error) {
+      toast({
+        title: "Couldn't accept invitation! 😖",
+        description: "Check your internet connection",
+      });
+      setIsRegistered(true);
       console.error(error);
     }
   }
@@ -184,23 +181,50 @@ export default function AcceptInvitation() {
 }
 
 function ProfileForm({ className }: React.ComponentProps<"form">) {
+  const registerForm = useForm({
+    defaultValues: { password: "" },
+    mode: "onTouched",
+    reValidateMode: "onChange",
+  });
+  const navigate = useNavigate();
+
+  async function handleSubmitOnRegistering() {
+    navigate("/userData");
+  }
+
   return (
-    <form className={cn("grid items-start gap-4", className)}>
-      <div className="grid gap-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          type="email"
-          id="email"
-          defaultValue="chimanshu458@gmail.com"
-          disabled
-        />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="password">Password</Label>
-        <Input type="password" id="username" defaultValue="" />
-      </div>
-      <Button type="submit">Register</Button>
-    </form>
+    <Form {...registerForm}>
+      <form
+        className={cn("grid items-start gap-4", className)}
+        onSubmit={handleSubmitOnRegistering}
+      >
+        {/* <FormField
+          name="password"
+          render={({ field }) => {
+            return ( */}
+        {/* // <FormItem> */}
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            type="email"
+            id="email"
+            defaultValue="example@gmail.com"
+            disabled
+          />
+        </div>
+        <div className="grid gap-2">
+          {/* <FormControl> */}
+          <Label htmlFor="password">Password</Label>
+          <Input type="password" />
+          {/* </FormControl> */}
+        </div>
+        {/* </FormItem> */}
+        {/* );
+          }}
+        /> */}
+        <Button type="submit">Register</Button>
+      </form>
+    </Form>
   );
 }
 /* 
