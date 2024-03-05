@@ -1,19 +1,13 @@
 import { CardDescription } from "@/components/ui/card";
-import React from "react";
 import { useParams } from "react-router-dom";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-interface UserFileDetailsProps {
-  fileId: string;
-}
 
 export const UserFileDetails = () => {
   const { uid } = useParams();

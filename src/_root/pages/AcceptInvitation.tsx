@@ -84,7 +84,7 @@ export default function AcceptInvitation() {
           description: `You're officially a part of ${teamName}.All the best for your journey. 💪`,
         });
 
-        navigate("/");
+        navigate("/userData");
       } else {
         toast({
           title: "Couldn't accept invitation! 😖",
@@ -92,6 +92,11 @@ export default function AcceptInvitation() {
         });
       }
     } catch (error) {
+      toast({
+        title: "Couldn't accept invitation! 😖",
+        description: "Check your internet connection",
+      });
+      setIsRegistered(true);
       console.error(error);
     }
   }

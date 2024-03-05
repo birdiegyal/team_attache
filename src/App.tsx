@@ -14,6 +14,7 @@ import { Collections } from "./_root/pages/Collections";
 import { FileDetails } from "./_root/pages/FileDetails";
 import { UserShowData } from "./_root/pages/UserShowData";
 import { UserFileDetails } from "./_root/pages/UserFileDetails";
+import { CollectionSettings } from "./_root/pages/CollectionSettings";
 
 export default function App() {
   return (
@@ -36,6 +37,10 @@ export default function App() {
             <Route path="/collections" element={<Collections />} />
             <Route path="/collections/:id" element={<FileDetails />} />
             <Route path="/userData" element={<UserShowData />} />
+            <Route
+              path="/collectionSettings"
+              element={<CollectionSettings />}
+            />
             <Route path="/userData/:uid" element={<UserFileDetails />} />
             
           </Route>
